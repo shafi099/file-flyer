@@ -1,4 +1,4 @@
-<div class="App bg-[url('/assets/layered-waves-haikei.svg')] bg-cover bg-center" style="height:100vh;">
+<div class="App bg-[url('/assets/layered-waves-haikei.svg')] bg-cover bg-center" style="height:120vh">
   <app-header></app-header>
 
   <div class="flex flex-col items-center justify-center align-middle ">
@@ -7,7 +7,7 @@
         <path fill="#ffa000" d="M40,12H22l-4-4H8c-2.2,0-4,1.8-4,4v24c0,2.2,1.8,4,4,4h29.7L44,29V16C44,13.8,42.2,12,40,12z"></path><path fill="#ffca28" d="M40,12H8c-2.2,0-4,1.8-4,4v20c0,2.2,1.8,4,4,4h32c2.2,0,4-1.8,4-4V16C44,13.8,42.2,12,40,12z"></path>
         </svg>
     </span> -->
-    <span class="text-md text-slate-400">Wherever, Whenever, We Deliver</span>
+    <span class="text-sm text-slate-400">Wherever, Whenever, We Deliver</span>
 
     <span class="mt-2">
       <img src="assets/logoF.png" class="mix-blend-screen w-36" />
@@ -61,25 +61,19 @@
     </div>
   </div>
 
-  <!-- <div *ngFor="let item of items; let i = index">
-    <div class="file-item">
-      <span>{{ item.name }}</span>
-      <span>{{ item.size }}</span>
-      <button (click)="onDelete(i)">Delete</button>
-    </div>
-  </div>  -->
+
 
   <div class="flex items-center justify-center mt-3">
     <span class="text-slate-400">Selected Files</span>
   </div>
 
+<div class="flex flex-col h-72 overflow-auto items-center mx-96 rounded-2xl shadow-md border-t-slate-700/20 border-b-slate-950 border-transparent border-2  bg-slate-950/50 py-3 fileItems">
+  <div class="flex flex-col justify-center align-top items-center my-1" *ngFor="let item of items; let i = index">
 
-<div class="flex flex-col h-72 overflow-auto items-center mx-72 fileItems">
-  <div class="flex flex-col justify-center align-top items-center " *ngFor="let item of items; let i = index">
     <div class="flex flex-col items-center justify-center align-top">
      
-      <div class="file-item flex justify-end align-middle">
-        <div class="text-slate-100 text-xl w-6 items-end">
+      <div class="file-item flex justify-center align-middle">
+        <div class="text-slate-100 text-xl pr-4 w-12 items-end">
           <!-- <i class="bi bi-file-earmark"></i> -->
           <span>{{ i+1 }}.</span>
         </div>
@@ -93,16 +87,30 @@
         
         
       </div>
-      <!-- <div class="file-item">
-        <span>ShafiImage</span>
-        <span>1024MB</span>
-        <button (click)="onDelete(1)">Delete</button>
-      </div> -->
+
     </div>
-    <hr class="w-96 rounded-lg border-t-2 border-slate-700 my-1">
+    <div class="w-full border-dashed rounded-lg border-t-2 border-slate-700 my-1"></div>
   </div>
 
+ 
 
+</div>
+<div class="flex items-center justify-center flex-row flex-wrap mt-2">
+<div class="text-slate-100">
+  <span>{{itemsLength()}} Files, {{itemsSize()}}</span>
 
 </div>
 </div>
+
+
+  <div class="flex items-center justify-center flex-row flex-wrap mt-6">
+    <button class="bg-slate-200 flex items-center hover:bg-slate-50 text-slate-950 
+    font-semibold px-5 py-1 rounded-xl drop-shadow-md border-t-2 border-t-slate-50
+     border-b-slate-950 "
+     (click)='fileEncode()'
+     >
+      Send/Encode
+      <i class="bi bi-send-fill"></i>
+    </button>
+  </div>
+  </div>

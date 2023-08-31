@@ -17,15 +17,21 @@
 
 .fileItems::-webkit-scrollbar {
   width: 10px;
-  background-color: blue;
+  background-color: #020617;
+  
 }
 
 .fileItems::-webkit-scrollbar-track {
-  box-shadow: inset 0 0 5px grey;
+  /* box-shadow: inset 0 0 5px grey; */
   border-radius: 10px;
 }
 
 .fileItems::-webkit-scrollbar-thumb {
-  background: #020617;
+  background: #1e293b;
   border-radius: 20px;
+}
+
+/* Define the dotted border style */
+.border-dashed {
+  border-style: dotted;
 }
