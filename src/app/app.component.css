@@ -17,7 +17,7 @@
 
 .fileItems::-webkit-scrollbar {
   width: 10px;
-  background-color: #030a2b;
+  background-color: #000b3f;
   
 }
 
@@ -27,7 +27,7 @@
 }
 
 .fileItems::-webkit-scrollbar-thumb {
-  background: #030303;
+  background: #ffffff;
   border-radius: 20px;
 }
 

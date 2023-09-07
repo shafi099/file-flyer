@@ -7,6 +7,8 @@ import * as FileSaver from 'file-saver';
 // import { TableModule } from 'primeng/table';  
 // import { GlobalServicesService } from 'src/app/services/global-services.service'; 
 // import ascii85 from 'ascii85';
+// import { PDFDocument, rgb } from 'pdf-lib';
+// import { readFile } from 'pdf-parse';
 
 
 @Component({
@@ -187,7 +189,6 @@ fileEncode() {
     reader.onload = () => {
       const base64String = reader.result as string;
       // Log the Base64-encoded string to the console
-      // console.log(base64String);
       const blob = new Blob([base64String], { type: 'text/plain' });
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement('a');
@@ -220,15 +221,9 @@ readFileDecode(event: Event) {
 
       reader.onload = (e: any) => {
         const fileContent = e.target.result;
-        // console.log(fileContent);
         const fileName = 'file-flyer.zip';
-        // const downloadLink = document.createElement('a');
-        // downloadLink.href = fileContent;
-        // downloadLink.download = fileName;
-        // downloadLink.click();
         this.fileFlyerFile = fileContent;
         this.alertMessage= 'Your file is ready, click the button below' ;
-        // this.fileFlyerOptions = '';
         this.downloadBtn = true
       };
 
@@ -239,6 +234,7 @@ readFileDecode(event: Event) {
     }
   }
 }
+
 
 
 
