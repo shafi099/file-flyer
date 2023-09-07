@@ -2,115 +2,173 @@
   <app-header></app-header>
 
   <div class="flex flex-col items-center justify-center align-middle ">
-    <!-- <span class="text-3xl font-bold text-slate-50">File Flyer
-      <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="100" height="100" viewBox="0 0 48 48">
-        <path fill="#ffa000" d="M40,12H22l-4-4H8c-2.2,0-4,1.8-4,4v24c0,2.2,1.8,4,4,4h29.7L44,29V16C44,13.8,42.2,12,40,12z"></path><path fill="#ffca28" d="M40,12H8c-2.2,0-4,1.8-4,4v20c0,2.2,1.8,4,4,4h32c2.2,0,4-1.8,4-4V16C44,13.8,42.2,12,40,12z"></path>
-        </svg>
-    </span> -->
-    <span class="text-sm text-slate-400">Wherever, Whenever, We Deliver</span>
-
+    <span class="text-sm text-slate-400 animate-fade animate-once animate-duration-[1000ms]">Wherever, Whenever, We
+      Deliver</span>
     <span class="mt-2">
-      <img src="assets/logoF.png" class="mix-blend-screen w-36" />
+      <img src="assets/logoF.png" class="mix-blend-screen w-36 animate-fade animate-once animate-duration-[2000ms]" />
     </span>
-
-
   </div>
+
 
   <!-- <div class="flex flex-row justify-center align-middle text-xl font-bold text-slate-50">
     End-to-End Data Transfer
   </div> -->
 
-  <!-- <div class=" flex items-center justify-center mt-6">
-  <div class="flex flex-row flex-wrap">
-      <div class="m-5 bg-slate-200 hover:bg-slate-50 text-slate-950 font-semibold px-5 py-1 rounded-xl drop-shadow-md border-t-2 border-t-slate-50 border-b-slate-950 ">
-        <button>
+
+  <!-- option buttons  -->
+  <div class=" flex items-center justify-center mt-6" *ngIf="fileFlyerOptions==='options'">
+    <div class="flex flex-row flex-wrap">
+      <div
+        class="animate-fade-right animate-once animate-duration-[1000ms] m-5 bg-slate-200 hover:bg-slate-50 text-slate-950 font-semibold px-5 py-1 rounded-xl drop-shadow-md border-t-2 border-t-slate-50 border-b-slate-950 ">
+        <button (click)="toggleOptions('send')">
           Send/Encode
           <i class="bi bi-send-fill"></i>
         </button>
       </div>
-      <div class="m-5 bg-slate-200 hover:bg-slate-50 text-slate-950 font-semibold px-5 py-1 rounded-xl drop-shadow-md border-t-2 border-t-slate-50 border-b-slate-950 ">
-        <button>Receiver/Decode
-          <i class="bi bi-inbox-fill"></i>
+      <div
+        class="animate-fade-left animate-once animate-duration-[1000ms] m-5 bg-slate-200 hover:bg-slate-50 text-slate-950 font-semibold px-5 py-1 rounded-xl drop-shadow-md border-t-2 border-t-slate-50 border-b-slate-950 ">
+        <button (click)="toggleOptions('receive')">Receiver/Decode
+          <i class="bi bi-cloud-arrow-down-fill"></i>
         </button>
       </div>
+    </div>
+
   </div>
 
-</div> -->
+
+  <!-- send section  -->
+  <div *ngIf="fileFlyerOptions==='send'">
+
+    <div class=" flex items-center justify-center mt-3 w-full">
+
+      <!-- dnd here  -->
+      <div
+        class="flex flex-row justify-center p-4 bg-slate-950/30 rounded-3xl border-2 border-slate-600 drop-shadow-lg animate-fade animate-once"
+        (drop)="onDrop($event)" (dragover)="onDragOver($event)" style="border:2px dashed #475569">
+        <div class="w-52 flex flex-row justify-center items-center">
+          <span class="flex flex-row text-slate-400 font-medium text-md">Drag and drop files here</span>
+        </div>
+        <div class="w-12 drop-container flex justify-center items-center py-2">
+          <span class="text-slate-500 font-medium text-sm">or</span>
+        </div>
 
 
-  <!-- drap and drop section  -->
-  <div class=" flex items-center justify-center mt-6">
-    <div
-      class="w-80 flex flex-col justify-center p-4 bg-slate-950/30 border-dashed rounded-3xl border-2 border-slate-600 drop-shadow-lg"
-      (drop)="onDrop($event)" (dragover)="onDragOver($event)">
-      <div class="flex justify-center items-center">
-        <span class="text-slate-400 font-medium text-md">Drag and drop files here</span>
-      </div>
-      <div class="drop-container flex justify-center items-center py-2">
-        <span class="text-slate-500 font-medium text-sm">or</span>
-      </div>
-
-
-      <div class="drop-container flex justify-center items-center">
-        <span class="text-slate-400 font-medium text-md">
-          <input type="file" multiple (change)="onFileSelected($event)" style="display: none;" #fileInput />
-          <button class="mt-2 bg-slate-200 text-slate-950  rounded-xl px-4 py-0 border-t-2 border-t-slate-600/50 "
-            (click)="fileInput.click()">Browse Files</button>
-        </span>
+        <div class="w-52 drop-container flex  flex-row justify-center items-center">
+          <span class="text-slate-400 font-medium text-md">
+            <input type="file" multiple (change)="onFileSelected($event)" style="display: none;" #fileInput />
+            <button
+              class="mt-2 flex flex-row bg-slate-200 text-slate-950  rounded-xl px-4 py-0 border-t-2 border-t-slate-50 border-b-2 border-b-slate-200 "
+              (click)="fileInput.click()">Browse Files</button>
+          </span>
+        </div>
       </div>
     </div>
-  </div>
 
 
 
-  <div class="flex items-center justify-center mt-3">
-    <span class="text-slate-400">Selected Files</span>
-  </div>
+    <div class="flex items-center justify-center mt-3" *ngIf="fileBox.length>0">
+      <span class="text-slate-400">Selected Files</span>
+    </div>
 
-<div class="flex flex-col h-72 overflow-auto items-center mx-96 rounded-2xl shadow-md border-t-slate-700/20 border-b-slate-950 border-transparent border-2  bg-slate-950/50 py-3 fileItems">
-  <div class="flex flex-col justify-center align-top items-center my-1" *ngFor="let item of items; let i = index">
 
-    <div class="flex flex-col items-center justify-center align-top">
-     
-      <div class="file-item flex justify-center align-middle">
-        <div class="text-slate-100 text-xl pr-4 w-12 items-end">
-          <!-- <i class="bi bi-file-earmark"></i> -->
-          <span>{{ i+1 }}.</span>
+    <!-- selected files -->
+    <div *ngIf="fileBox.length>0"
+      class="flex flex-col h-72 overflow-auto items-center mx-96 rounded-2xl shadow-md border-t-slate-700/20 border-b-slate-950 border-transparent border-2  bg-slate-950/50 py-3 fileItems">
+      <div class="flex flex-col justify-center align-top items-center my-1" *ngFor="let item of items; let i = index">
+
+        <div class="flex flex-col items-center justify-center align-top">
+
+          <div class="file-item flex justify-center align-middle animate-jump animate-once animate-duration-[1200ms]">
+            <div class="text-slate-100 text-xl pr-4 w-12 items-end ">
+              <!-- <i class="bi bi-file-earmark"></i> -->
+              <span>{{ i+1 }}.</span>
+            </div>
+            <div class="flex flex-col w-96 justify-start items-start">
+              <span class="text-slate-50 text-sm ">{{ item.name }}</span>
+              <span class="text-slate-50/50 text-xs ">{{ item.size }}</span>
+            </div>
+            <div class="w-24 items-center flex align-middle ">
+              <button
+                class="bg-red-700 rounded-xl px-3  text-red-200 justify-center flex align-middle border-t-2 border-b-4 border-b-red-700 border-t-red-600 shadow-md text-xs font-semibold "
+                (click)="onDelete(i)">Remove</button>
+            </div>
+
+
+          </div>
+
         </div>
-        <div class="flex flex-col w-96 justify-start items-start">
-          <span class="text-slate-50 text-sm">{{ item.name }}</span>
-          <span class="text-slate-50/50 text-xs">{{ item.size }}</span>
-        </div>
-        <div class="w-24 items-center flex align-middle">
-          <button class="bg-red-700 rounded-xl px-4  text-red-200 justify-center flex align-middle border-t-2 border-t-red-500 shadow-md text-sm" (click)="onDelete(i)">Delete</button>
-        </div>
-        
-        
+        <div class="w-full border-dotted rounded-lg border-t-2 border-slate-700 my-1"></div>
       </div>
 
+
+
     </div>
-    <div class="w-full border-dashed rounded-lg border-t-2 border-slate-700 my-1"></div>
-  </div>
 
- 
+    <!-- files and size -->
+    <div class="flex items-center justify-center flex-row flex-wrap mt-2" *ngIf="fileBox.length>0">
+      <div class="text-slate-100">
+        <span>{{itemsLength()}} Files, {{itemsSize()}}</span>
 
-</div>
-<div class="flex items-center justify-center flex-row flex-wrap mt-2">
-<div class="text-slate-100">
-  <span>{{itemsLength()}} Files, {{itemsSize()}}</span>
+      </div>
+    </div>
 
-</div>
-</div>
-
-
-  <div class="flex items-center justify-center flex-row flex-wrap mt-6">
-    <button class="bg-slate-200 flex items-center hover:bg-slate-50 text-slate-950 
+    <!-- send/encode -->
+    <div class="flex items-center justify-center flex-row flex-wrap mt-6 animate-fade animate-once" *ngIf="fileBox.length>0">
+      <button class="bg-slate-200 flex items-center hover:bg-slate-50 text-slate-950 
     font-semibold px-5 py-1 rounded-xl drop-shadow-md border-t-2 border-t-slate-50
-     border-b-slate-950 "
-     (click)='fileEncode()'
-     >
-      Send/Encode
-      <i class="bi bi-send-fill"></i>
-    </button>
+     border-b-slate-950 animate-bounce animate-infinite animate-duration-[1200ms] animate-ease-linear animate-alternate animate-fill-forwards" (click)='fileEncode()' >
+        Send/Encode
+        <i class="bi bi-send-fill"></i>
+      </button>
+    </div>
+
   </div>
+
+
+  <!-- receive file -->
+  <div *ngIf="fileFlyerOptions=='receive'">
+    <div class="flex flex-col items-center justify-center mt-12 w-full">
+      <div
+        class="flex flex-col items-center justify-center p-1 bg-slate-950/30 rounded-3xl border-2 border-slate-600 drop-shadow-lg animate-fade animate-once"
+        style="border:2px dashed #475569" *ngIf="!downloadBtn">
+        <div class="w-80 drop-container flex  flex-row justify-center items-end">
+          <span class="text-slate-400 font-medium text-md flex  flex-row items-end">
+            <input type="file" (change)="readFileDecode($event)" style="display: none;" #readFile />
+            <button
+              class="mt-2 flex flex-row bg-slate-200 text-slate-950  rounded-xl px-4 py-0 border-t-2 border-t-slate-50 border-b-2 border-b-slate-200 "
+              (click)="readFile.click()">Select encode file here</button>
+          </span>
+        </div>
+
+        <div class="w-12 drop-container flex justify-center items-center py-2">
+          <span class="text-slate-500 font-medium text-sm">or</span>
+        </div>
+
+        <div class="w-80 my-1 flex flex-col justify-center items-center">
+          <span class="flex flex-row text-slate-400 text-md">Enter encode text below</span>
+
+          <textarea type="text"
+            class="w-72 h-12 rounded-xl resize-y bg-slate-800 border-t-2 border-t-slate-700 border-b-2 border-b-slate-950 text-slate-100 p-2 overflow-auto text-md font-normal m-1"></textarea>
+
+        </div>
+
+        
+      </div>
+
+      <div class="flex items-center justify-center flex-row flex-wrap mt-6 animate-fade animate-once">
+        <span class="text-red-500 font-semibold">{{ alertMessage }}</span>
+      </div>
+
+      <div class="flex items-center justify-center flex-row flex-wrap mt-6 animate-fade animate-once" *ngIf="downloadBtn">
+        <button class="bg-green-600 flex items-center hover:bg-green-800 text-green-100 
+      font-semibold px-3 py-1 rounded-xl drop-shadow-md border-t-2 border-t-green-400
+       border-b-slate-950 animate-bounce animate-infinite animate-duration-[1200ms] animate-ease-linear animate-alternate animate-fill-forwards" >
+       <a [href]="fileFlyerFile" download="file-flyer.zip">
+          Download
+          <i class="bi bi-cloud-arrow-down-fill ms-2"></i></a>
+        </button>
+      </div>
+    </div>
   </div>
+
+</div>
