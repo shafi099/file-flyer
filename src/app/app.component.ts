@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef, OnInit  } from '@angular/core';
+import { Component, ViewChild, ElementRef, OnInit, AfterViewInit } from '@angular/core';
 // import * as JSZip from 'jszip';
 // import { Component, OnInit } from '@angular/core';  
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';  
@@ -16,8 +16,28 @@ import * as FileSaver from 'file-saver';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
+export class AppComponent implements AfterViewInit  {
   title = 'file-flyer';
+
+  @ViewChild('downloadButtonPlaceholder', { static: false }) downloadButtonPlaceholder!: ElementRef;
+
+  ngAfterViewInit() {
+    this.showDownloadButton();
+  }
+
+  showDownloadButton() {
+    const downloadButton = document.createElement('button');
+    downloadButton.className = 'bg-green-700 flex items-center hover:bg-green-900 text-green-100 font-semibold px-3 py-1 rounded-xl drop-shadow-md border-t-2 border-t-green-400 border-b-slate-950 font-sans animate-bounce animate-infinite animate-duration-[1200ms] animate-ease-linear animate-alternate animate-fill-forwards';
+    downloadButton.innerHTML = `
+      <a [href]="fileFlyerFile" download="file-flyer.zip">
+        Download
+        <i class="bi bi-cloud-arrow-down-fill ms-2"></i>
+      </a>
+    `;
+
+    // Append the download button to the placeholder
+    this.downloadButtonPlaceholder.nativeElement.appendChild(downloadButton);
+  }
 
   fileFlyerOptions:any = 'options';
 
@@ -168,72 +188,169 @@ onDrop(event: DragEvent) {
 // });
 
 // }
-
 fileEncode() {
-  if(this.fileBox.length>0){
-  const zip = new JSZip();
+  if (this.fileBox.length > 0) {
+    const zip = new JSZip();
 
-  // Iterate through each file in fileBox and add them to the ZIP
-  for (let i = 0; i < this.fileBox.length; i++) {
-    const file = this.fileBox[i];
+    // Iterate through each file in fileBox and add them to the ZIP
+    for (let i = 0; i < this.fileBox.length; i++) {
+      const file = this.fileBox[i];
 
-    // Use the file's name as the entry name in the ZIP
-    // You can set the compression level here (e.g., 'DEFLATE' for standard compression)
-    zip.file(file.name, file, { compression: 'DEFLATE' });
+      // Use the file's name as the entry name in the ZIP
+      // You can set the compression level here (e.g., 'DEFLATE' for standard compression)
+      zip.file(file.name, file, { compression: 'DEFLATE' });
+    }
+
+    // Generate the ZIP file asynchronously
+    zip.generateAsync({ type: 'blob' }).then((blob) => {
+      // Create a base64-encoded text file from the ZIP blob
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64String = reader.result as string;
+
+        // Create a Blob containing the base64-encoded text
+        const textBlob = new Blob([base64String], { type: 'text/plain' });
+
+        // Create a new ZIP file and add the base64 text file
+        const zipWithText = new JSZip();
+        zipWithText.file('base64.txt', textBlob, { compression: 'DEFLATE' });
+
+        // Generate the final ZIP file asynchronously
+        zipWithText.generateAsync({ type: 'blob' }).then((finalBlob) => {
+          // Save the final ZIP file with a specified name (e.g., 'encoded.zip')
+          FileSaver.saveAs(finalBlob, 'encoded.zip');
+        });
+
+        this.fileFlyerOptions = 'options';
+      };
+      reader.readAsDataURL(blob);
+    });
   }
+}
 
-  // Generate the ZIP file asynchronously
-  zip.generateAsync({ type: 'blob' }).then((blob) => {
-    // Convert the ZIP blob to Base64
-    const reader = new FileReader();
-    reader.onload = () => {
-      const base64String = reader.result as string;
-      // Log the Base64-encoded string to the console
-      const blob = new Blob([base64String], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      const anchor = document.createElement('a');
-      anchor.href = url;
-      anchor.download = 'file.txt';
-      document.body.appendChild(anchor);
-      anchor.click();
-      document.body.removeChild(anchor);
-      window.URL.revokeObjectURL(url);
-      this.fileFlyerOptions='options'
-    };
-    reader.readAsDataURL(blob);
-  });
-}
-}
 
 
 alertMessage:any = ''
 downloadBtn:any = false;
 fileFlyerFile:any = '';
+downloadInProgress: boolean = false;
+downloadProgress: number = 0;
+
 
 readFileDecode(event: Event) {
   const inputElement = event.target as HTMLInputElement;
   if (inputElement.files && inputElement.files.length > 0) {
     const file = inputElement.files[0];
-    const allowedFileTypes = ['text/plain'];
+    const allowedFileTypes = ['application/zip', 'application/x-zip-compressed'];
+
 
     if (allowedFileTypes.includes(file.type)) {
+      // Read the uploaded ZIP file
       const reader = new FileReader();
 
-      reader.onload = (e: any) => {
-        const fileContent = e.target.result;
-        const fileName = 'file-flyer.zip';
-        this.fileFlyerFile = fileContent;
-        this.alertMessage= 'Your file is ready, click the button below' ;
-        this.downloadBtn = true
+      reader.onload = async (e: any) => {
+        const zipContent = e.target.result;
+      
+        // Create a new JSZip instance and load the uploaded ZIP content
+        const zip = new JSZip();
+        await zip.loadAsync(zipContent);
+      
+        // Extract the base64 text file from the ZIP
+        const base64TextFile = await zip.file('base64.txt')?.async('text');
+      
+        if (base64TextFile) {
+          console.log('Base64 String:', base64TextFile);
+          this.fileFlyerFile = base64TextFile ;
+          
+          this.downloadInProgress = true;
+            this.downloadProgress = 0;
+          this.alertMessage = 'Your file is ready, click the button below';
+          this.downloadBtn = true;
+          // Create a Blob from the base64 text
+          const textBlob = new Blob([base64TextFile], { type: 'text/plain' });
+      
+          // Create a new ZIP file containing the original files
+          // const newZip = new JSZip();
+          // this.fileBox.forEach((originalFile) => {
+          //   newZip.file(originalFile.name, originalFile);
+          //   // console.log(base64TextFile);
+          // });
+      
+          // Generate the final ZIP file asynchronously
+          // newZip.generateAsync({ type: 'blob' }).then((finalBlob) => {
+            // Display the download button and hide the progress bar
+            
+      
+            // Save the final ZIP file with a specified name (e.g., 'decoded.zip')
+            // FileSaver.saveAs(finalBlob, 'decoded.zip');
+          // });
+      
+          // Create a download link for the base64 text
+          const blobUrl = URL.createObjectURL(textBlob);
+          const anchor = document.createElement('a');
+          anchor.href = blobUrl;
+          anchor.download = 'decoded.txt';
+          URL.revokeObjectURL(blobUrl);
+        } else {
+          this.alertMessage = 'Base64 text file not found in the ZIP.';
+        }
       };
-
-      reader.readAsText(file);
+      
+      // Update the progress bar during the download
+      reader.onprogress = (e: ProgressEvent) => {
+        if (e.lengthComputable) {
+          this.downloadProgress = (e.loaded / e.total) * 100;
+          console.log('progress',(e.loaded / e.total) * 100)
+        }
+      };
+      
+      this.downloadBtn = true;
+      reader.readAsArrayBuffer(file);
     } else {
-      this.alertMessage= 'Invalid file type. Please upload a .txt file.'
-      console.log('Invalid file type. Please upload a .txt file.');
+      this.alertMessage = 'Invalid file type. Please upload a .zip file.';
+      console.log('Invalid file type. Please upload a .zip file.');
     }
   }
+  // this.downloadBtn = true;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
