@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef, OnInit, AfterViewInit } from '@angular/core';
+import { Component, ViewChild, ElementRef,} from '@angular/core';
 // import * as JSZip from 'jszip';
 // import { Component, OnInit } from '@angular/core';  
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';  
@@ -16,28 +16,14 @@ import * as FileSaver from 'file-saver';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements AfterViewInit  {
+export class AppComponent {
   title = 'file-flyer';
 
   @ViewChild('downloadButtonPlaceholder', { static: false }) downloadButtonPlaceholder!: ElementRef;
 
-  ngAfterViewInit() {
-    this.showDownloadButton();
-  }
+ 
 
-  showDownloadButton() {
-    const downloadButton = document.createElement('button');
-    downloadButton.className = 'bg-green-700 flex items-center hover:bg-green-900 text-green-100 font-semibold px-3 py-1 rounded-xl drop-shadow-md border-t-2 border-t-green-400 border-b-slate-950 font-sans animate-bounce animate-infinite animate-duration-[1200ms] animate-ease-linear animate-alternate animate-fill-forwards';
-    downloadButton.innerHTML = `
-      <a [href]="fileFlyerFile" download="file-flyer.zip">
-        Download
-        <i class="bi bi-cloud-arrow-down-fill ms-2"></i>
-      </a>
-    `;
 
-    // Append the download button to the placeholder
-    this.downloadButtonPlaceholder.nativeElement.appendChild(downloadButton);
-  }
 
   fileFlyerOptions:any = 'options';
 
@@ -75,14 +61,18 @@ itemsSize() {
   return megabytes.toFixed(2) + ' MB';
 }
 
+backHome(){
+  this.fileFlyerOptions= 'options'
+}
+
 onDrop(event: DragEvent) {
   event.preventDefault();
   event.stopPropagation();
   (event.currentTarget as HTMLElement).classList.remove('drag-over');
 
   const files = event.dataTransfer!.files;
-  console.log(files.length)
-  console.log(files)
+  // console.log(files.length)
+  // console.log(files)
   if (files.length > 0) {
     for (let i = 0; i < files.length; i++) {
       this.fileBox.push(files[i]); // Push each file into the fileBox array
@@ -99,7 +89,7 @@ onDrop(event: DragEvent) {
   
     for (let i = 0; i < fileListArray.length; i++) {
       const file = fileListArray[i];
-      console.log('File dropped:', file.name);
+      // console.log('File dropped:', file.name);
       this.items.push({
         name: file.name,
         size: this.formatFileSize(file.size)
@@ -188,6 +178,25 @@ onDrop(event: DragEvent) {
 // });
 
 // }
+decodeBtn :any = false
+encodeFromText(e:any){
+  const textArea = document.getElementById('encodeTextDrop') as HTMLTextAreaElement;
+  if(textArea.value.length !== 0){
+    this.decodeBtn = true
+  }
+  else{
+    this.decodeBtn = false;
+  }
+}
+
+decodeText(){
+  const textArea = document.getElementById('encodeTextDrop') as HTMLTextAreaElement;
+  this.fileFlyerFile = 'data:application/zip;base64,'+textArea.value ;
+  this.alertMessage = 'Your file is ready, click the button below';
+  this.downloadBtn = true;
+}
+
+
 fileEncode() {
   if (this.fileBox.length > 0) {
     const zip = new JSZip();
@@ -207,9 +216,12 @@ fileEncode() {
       const reader = new FileReader();
       reader.onload = () => {
         const base64String = reader.result as string;
-
+        // console.log('base64',base64String);
+        const base64 = base64String.replace('data:application/zip;base64,','');
+        
+        // console.log('base64',base64);
         // Create a Blob containing the base64-encoded text
-        const textBlob = new Blob([base64String], { type: 'text/plain' });
+        const textBlob = new Blob([base64], { type: 'text/plain' });
 
         // Create a new ZIP file and add the base64 text file
         const zipWithText = new JSZip();
@@ -218,7 +230,7 @@ fileEncode() {
         // Generate the final ZIP file asynchronously
         zipWithText.generateAsync({ type: 'blob' }).then((finalBlob) => {
           // Save the final ZIP file with a specified name (e.g., 'encoded.zip')
-          FileSaver.saveAs(finalBlob, 'encoded.zip');
+          FileSaver.saveAs(finalBlob, 'file-flyer.zip');
         });
 
         this.fileFlyerOptions = 'options';
@@ -259,8 +271,8 @@ readFileDecode(event: Event) {
         const base64TextFile = await zip.file('base64.txt')?.async('text');
       
         if (base64TextFile) {
-          console.log('Base64 String:', base64TextFile);
-          this.fileFlyerFile = base64TextFile ;
+          // console.log('Base64 String:', base64TextFile);
+          this.fileFlyerFile = 'data:application/zip;base64,'+base64TextFile ;
           
           this.downloadInProgress = true;
             this.downloadProgress = 0;
@@ -300,7 +312,7 @@ readFileDecode(event: Event) {
       reader.onprogress = (e: ProgressEvent) => {
         if (e.lengthComputable) {
           this.downloadProgress = (e.loaded / e.total) * 100;
-          console.log('progress',(e.loaded / e.total) * 100)
+          // console.log('progress',(e.loaded / e.total) * 100)
         }
       };
       

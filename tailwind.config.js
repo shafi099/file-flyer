@@ -22,9 +22,10 @@ module.exports = {
       '2xl': {'min': '1536px'},
       // => @media (min-width: 1536px) { ... }
     },
-    fontFamily: {
-      // 'Helvetica', 'Arial', 'sans-serif'
-      'sans': ['Segoe UI', ],
-  }
+    extend: {
+      fontFamily: {
+        'sans': ['Segoe UI', 'Arial', 'sans'],
+      },
+    },
 },
 }
