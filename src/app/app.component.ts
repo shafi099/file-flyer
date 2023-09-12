@@ -1,9 +1,10 @@
-import { Component, ViewChild, ElementRef,} from '@angular/core';
+import { Component, ViewChild, ElementRef,NgZone } from '@angular/core';
 // import * as JSZip from 'jszip';
 // import { Component, OnInit } from '@angular/core';  
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';  
 import * as JSZip from 'jszip';  
 import * as FileSaver from 'file-saver';  
+import * as zip from '@zip.js/zip.js';
 // import { TableModule } from 'primeng/table';  
 // import { GlobalServicesService } from 'src/app/services/global-services.service'; 
 // import ascii85 from 'ascii85';
@@ -21,7 +22,7 @@ export class AppComponent {
 
   @ViewChild('downloadButtonPlaceholder', { static: false }) downloadButtonPlaceholder!: ElementRef;
 
- 
+  constructor(private ngZone: NgZone){}
 
 
 
@@ -196,6 +197,7 @@ decodeText(){
   this.downloadBtn = true;
 }
 
+uploadBar: number = 0;
 
 fileEncode() {
   if (this.fileBox.length > 0) {
@@ -214,12 +216,16 @@ fileEncode() {
     zip.generateAsync({ type: 'blob' }).then((blob) => {
       // Create a base64-encoded text file from the ZIP blob
       const reader = new FileReader();
+      // reader.onprogress = (e: ProgressEvent) => {
+      //   if (e.lengthComputable) {
+      //     this.uploadBar = (e.loaded / e.total) * 100;
+      //   }
+      // };
       reader.onload = () => {
         const base64String = reader.result as string;
         // console.log('base64',base64String);
-        const base64 = base64String.replace('data:application/zip;base64,','');
-        
-        // console.log('base64',base64);
+        const base64 = base64String.replace('data:application/zip;base64,', '');
+
         // Create a Blob containing the base64-encoded text
         const textBlob = new Blob([base64], { type: 'text/plain' });
 
@@ -235,10 +241,12 @@ fileEncode() {
 
         this.fileFlyerOptions = 'options';
       };
+
       reader.readAsDataURL(blob);
     });
   }
 }
+
 
 
 
@@ -248,6 +256,72 @@ fileFlyerFile:any = '';
 downloadInProgress: boolean = false;
 downloadProgress: number = 0;
 
+fileArray: any = [];
+contentArray: any = []; // Store extracted file content
+downloadUrls: string[] = []; // Store download URLs
+
+// ...
+originalFilenames: string[] = []; // Store original filenames
+
+async extractZipFile(zipFileUrl: string) {
+try {
+  const response = await fetch(zipFileUrl);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch the zip file: ${response.status} ${response.statusText}`);
+  }
+
+  const arrayBuffer = await response.arrayBuffer();
+
+  const zipReader = new zip.ZipReader(new zip.Uint8ArrayReader(new Uint8Array(arrayBuffer)));
+  const entries = await zipReader.getEntries();
+
+  for (const entry of entries) {
+    if (!entry.directory) {
+      const contentArrayBuffer = entry.getData && (await entry.getData(new zip.BlobWriter()));
+      if (contentArrayBuffer) {
+        const contentBlob = new Blob([contentArrayBuffer]);
+        const content = await this.blobToText(contentBlob);
+        this.fileArray.push(`${entry.filename}`);
+        this.contentArray.push(content);
+  
+        // Store the original filename from the zip entry
+        this.originalFilenames.push(entry.filename);
+  
+        // Generate download URL for the extracted file
+        const downloadUrl = URL.createObjectURL(contentBlob);
+        this.downloadUrls.push(downloadUrl);
+      }
+    }
+  }
+  
+
+  await zipReader.close();
+} catch (error) {
+  console.error('Error:', error);
+}
+}
+// ...
+
+
+async blobToText(blob: Blob): Promise<string> {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target?.result as string;
+      resolve(text);
+    };
+    reader.onerror = reject;
+    reader.readAsText(blob);
+  });
+}
+
+downloadFile(index: number,nameFile:any): void {
+  const downloadLink = document.createElement('a');
+  downloadLink.href = this.downloadUrls[index];
+  downloadLink.target = '_blank'; // Open the link in a new tab
+  downloadLink.download = nameFile; // Specify the filename
+  downloadLink.click();
+}
 
 readFileDecode(event: Event) {
   const inputElement = event.target as HTMLInputElement;
@@ -273,10 +347,10 @@ readFileDecode(event: Event) {
         if (base64TextFile) {
           // console.log('Base64 String:', base64TextFile);
           this.fileFlyerFile = 'data:application/zip;base64,'+base64TextFile ;
-          
+          this.extractZipFile('data:application/zip;base64,'+base64TextFile);
           this.downloadInProgress = true;
             this.downloadProgress = 0;
-          this.alertMessage = 'Your file is ready, click the button below';
+          this.alertMessage = 'Your files are ready to download';
           this.downloadBtn = true;
           // Create a Blob from the base64 text
           const textBlob = new Blob([base64TextFile], { type: 'text/plain' });
