@@ -1,27 +1,13 @@
 # FileFlyer
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.1.4.
+Simplifies file management, transformation, and sharing like never before. With us, you can effortlessly convert your uploaded files into a convenient zip format and then transform them into easily shareable, all with the click of a button.
 
-## Development server
+Website link : [FileFlyer.com](https://fileflyer.netlify.app/):link:
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+When a user chooses the "Send/Encode" option, FileFlyer accepts files via drag-and-drop or the "Browse Files" option that want to be converted to text format. It gives the .zip file which contains .txt of the chosen files, and the file is then downloaded automatically.
+Please be patient as the file may take some time to convert to text format before being compressed into a.zip file because we used free hosting.
 
-## Code scaffolding
+The FileFlyer accepts the.zip file containing the.txt file when the user clicks "Receive/Decode" and then displays the available files for download. You can choose to download individual files or all of them.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
 
-## Build
-
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+Developed by Shafi Shaik, Thank You :ocean:
